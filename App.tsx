@@ -36,7 +36,7 @@ const saveAnalyticsData = (data: AnalyticsData) => {
 const App: React.FC = () => {
   const [githubToken, setGithubToken] = useState<string>(getStoredToken);
   const [tokenInput, setTokenInput] = useState<string>('');
-  const [showTokenOverlay, setShowTokenOverlay] = useState<boolean>(!getStoredToken());
+  const [showTokenOverlay, setShowTokenOverlay] = useState<boolean>(!getStoredToken().trim());
 
   const handleSaveToken = () => {
     if (!tokenInput.trim()) return;

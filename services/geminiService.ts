@@ -4,7 +4,10 @@ const GITHUB_MODELS_ENDPOINT = 'https://models.inference.ai.azure.com/chat/compl
 const MODEL = 'gpt-4o';
 const TOKEN_KEY = 'zodiaclol_github_token';
 
-export const getStoredToken = (): string => localStorage.getItem(TOKEN_KEY) || '';
+declare const __DEFAULT_TOKEN__: string;
+const DEFAULT_TOKEN: string = typeof __DEFAULT_TOKEN__ !== 'undefined' ? __DEFAULT_TOKEN__ : '';
+
+export const getStoredToken = (): string => localStorage.getItem(TOKEN_KEY) || DEFAULT_TOKEN;
 export const saveToken = (token: string) => localStorage.setItem(TOKEN_KEY, token.trim());
 export const clearToken = () => localStorage.removeItem(TOKEN_KEY);
 
