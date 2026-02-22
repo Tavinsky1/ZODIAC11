@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ZodiacLOL</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        font-family: 'Lato', sans-serif;
+        background-color: #0D0B1F;
+        background-image: 
+          radial-gradient(at 20% 20%, hsla(273, 56%, 43%, 0.3) 0px, transparent 50%),
+          radial-gradient(at 80% 20%, hsla(50, 89%, 60%, 0.15) 0px, transparent 50%),
+          radial-gradient(at 80% 80%, hsla(300, 76%, 60%, 0.25) 0px, transparent 50%),
+          radial-gradient(at 20% 80%, hsla(210, 89%, 60%, 0.2) 0px, transparent 50%);
+        color: #F0E6FF;
+      }
+      .font-cinzel {
+        font-family: 'Cinzel', serif;
+      }
+      .text-glow {
+        text-shadow: 0 0 8px rgba(250, 204, 21, 0.7), 0 0 20px rgba(192, 132, 252, 0.5);
+      }
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .animate-fade-in {
+        animation: fadeIn 0.7s ease-out forwards;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.20.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/",
+    "react/": "https://aistudiocdn.com/react@^19.1.1/",
+    "react": "https://aistudiocdn.com/react@^19.1.1"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+  
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
