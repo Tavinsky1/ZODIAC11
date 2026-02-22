@@ -136,6 +136,29 @@ export function getDreamInterpretation(
   return generateStream(system, user);
 }
 
+export function getMercuryExcuse(
+  situation: string,
+  personality: Personality
+): AsyncGenerator<string> {
+  const system = getPersonaPrompt(personality);
+  const user = `Mercury is in retrograde (it's ALWAYS in retrograde when you need an excuse). The user needs a cosmic excuse for the following situation: "${situation}". Generate 3 increasingly unhinged Mercury Retrograde excuses for why this happened — each one more cosmically absurd than the last. Format them as a numbered list. Be dramatic, blame the planets, communication breakdowns, technology failures, and ancient cosmic curses. Make it funny and over-the-top.`;
+  return generateStream(system, user);
+}
+
+export function getRedFlagReading(
+  sign1: ZodiacSign,
+  sign2: ZodiacSign,
+  personality: Personality
+): AsyncGenerator<string> {
+  const system = getPersonaPrompt(personality);
+  const user = `Perform a brutal Red Flag Detector reading for ${sign1} and ${sign2} in a relationship. Structure it as:
+1. "🚩 ${sign1}'s Red Flags" - list 3 specific, savage red flags this sign brings to relationships
+2. "🚩 ${sign2}'s Red Flags" - list 3 specific, savage red flags this sign brings to relationships
+3. "☢️ Compatibility Verdict" - one brutally honest paragraph about how these two signs would actually do together, including the specific disaster that would unfold
+Be specific to each sign's stereotypes. Be merciless but funny.`;
+  return generateStream(system, user);
+}
+
 export function getPlantHoroscope(
   plantType: PlantType,
   sign: ZodiacSign,

@@ -14,6 +14,8 @@ import DreamDecoderView from './components/DreamDecoderView';
 import { playSubmitSound, playRevealSound } from './utils/sound';
 import CompatibilityView from './components/CompatibilityView';
 import PlantHoroscopeView from './components/PlantHoroscopeView';
+import MercuryExcuseView from './components/MercuryExcuseView';
+import RedFlagView from './components/RedFlagView';
 
 // Helper function to get analytics from localStorage
 const getAnalyticsData = (): AnalyticsData => {
@@ -290,6 +292,20 @@ const App: React.FC = () => {
         {view === 'compatibility' && <CompatibilityView logAnalytics={logAnalytics} personality={personality} onPersonalitySelect={handlePersonalitySelect} />}
         {view === 'plant' && (
           <PlantHoroscopeView
+            logAnalytics={logAnalytics}
+            personality={personality}
+            onPersonalitySelect={handlePersonalitySelect}
+          />
+        )}
+        {view === 'mercury' && (
+          <MercuryExcuseView
+            logGeneration={logGeneration}
+            personality={personality}
+            onPersonalitySelect={handlePersonalitySelect}
+          />
+        )}
+        {view === 'redflag' && (
+          <RedFlagView
             logAnalytics={logAnalytics}
             personality={personality}
             onPersonalitySelect={handlePersonalitySelect}

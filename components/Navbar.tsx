@@ -10,6 +10,8 @@ const navItems: { id: View; label: string; icon: string; }[] = [
   { id: 'horoscope', label: 'Horoscope', icon: '🔮' },
   { id: 'petHoroscope', label: 'Pet Horoscope', icon: '🐾' },
   { id: 'plant', label: 'Plant Horoscope', icon: '🌿' },
+  { id: 'mercury', label: 'Mercury Excuse', icon: '☿' },
+  { id: 'redflag', label: 'Red Flag Detector', icon: '🚩' },
   { id: 'dream', label: 'Dream Decoder', icon: '🌙' },
   // { id: 'compatibility', label: 'Compatibility' },
 ];
