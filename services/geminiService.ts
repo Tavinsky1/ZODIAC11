@@ -1,4 +1,4 @@
-import { ZodiacSign, Personality, PetType, PlantType } from "../types";
+import { ZodiacSign, Personality, PetType } from "../types";
 
 const GITHUB_MODELS_ENDPOINT = 'https://models.inference.ai.azure.com/chat/completions';
 const MODEL = 'gpt-4o';
@@ -156,16 +156,5 @@ export function getRedFlagReading(
 2. "🚩 ${sign2}'s Red Flags" - list 3 specific, savage red flags this sign brings to relationships
 3. "☢️ Compatibility Verdict" - one brutally honest paragraph about how these two signs would actually do together, including the specific disaster that would unfold
 Be specific to each sign's stereotypes. Be merciless but funny.`;
-  return generateStream(system, user);
-}
-
-export function getPlantHoroscope(
-  plantType: PlantType,
-  sign: ZodiacSign,
-  question: string,
-  personality: Personality
-): AsyncGenerator<string> {
-  const system = getPersonaPrompt(personality);
-  const user = `The user has a ${plantType} with zodiac sign ${sign}. They ask: "${question}". Give a cosmic reading from the PLANT'S PERSPECTIVE — what is it silently judging, plotting, or suffering through? Be brutally honest about the plant's feelings toward its owner. Roast the owner's plant-care skills (unless you're the Zen Dog, then be wholesome but still from the plant's perspective). Use plant puns generously.`;
   return generateStream(system, user);
 }
