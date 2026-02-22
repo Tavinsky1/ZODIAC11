@@ -18,7 +18,14 @@ export type Personality = 'default' | 'cat' | 'dog';
 
 export type PetType = 'Cat' | 'Dog' | 'Fish' | 'Bird' | 'Hamster';
 
-export type View = 'horoscope' | 'compatibility' | 'petHoroscope' | 'dream';
+export type PlantType = 'Cactus' | 'Succulent' | 'Monstera' | 'Pothos' | 'Orchid' | 'Fern' | 'Snake Plant' | 'Peace Lily';
+
+export type View = 'horoscope' | 'compatibility' | 'petHoroscope' | 'dream' | 'plant';
+
+export interface Plant {
+  name: PlantType;
+  icon: string;
+}
 
 export interface Zodiac {
   name: ZodiacSign;

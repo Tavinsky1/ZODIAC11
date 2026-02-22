@@ -13,6 +13,7 @@ import PetHoroscopeView from './components/PetHoroscopeView';
 import DreamDecoderView from './components/DreamDecoderView';
 import { playSubmitSound, playRevealSound } from './utils/sound';
 import CompatibilityView from './components/CompatibilityView';
+import PlantHoroscopeView from './components/PlantHoroscopeView';
 
 // Helper function to get analytics from localStorage
 const getAnalyticsData = (): AnalyticsData => {
@@ -287,6 +288,13 @@ const App: React.FC = () => {
           />
         )}
         {view === 'compatibility' && <CompatibilityView logAnalytics={logAnalytics} personality={personality} onPersonalitySelect={handlePersonalitySelect} />}
+        {view === 'plant' && (
+          <PlantHoroscopeView
+            logAnalytics={logAnalytics}
+            personality={personality}
+            onPersonalitySelect={handlePersonalitySelect}
+          />
+        )}
       </div>
       {showAdminLogin && <AdminLoginModal onSubmit={handleAdminLogin} onClose={() => setShowAdminLogin(false)} />}
       {/* Token update button — always visible in bottom-right */}

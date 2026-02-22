@@ -1,4 +1,4 @@
-import { Zodiac, Pet } from './types';
+import { Zodiac, Pet, Plant } from './types';
 
 export const ZODIAC_SIGNS: Zodiac[] = [
   { name: 'Aries', icon: '♈️' },
@@ -21,4 +21,15 @@ export const PET_TYPES: Pet[] = [
   { name: 'Fish', icon: '🐠' },
   { name: 'Bird', icon: '🦜' },
   { name: 'Hamster', icon: '🐹' },
+];
+
+export const PLANT_TYPES: Plant[] = [
+  { name: 'Cactus', icon: '🌵' },
+  { name: 'Succulent', icon: '🪴' },
+  { name: 'Monstera', icon: '🌿' },
+  { name: 'Pothos', icon: '🍃' },
+  { name: 'Orchid', icon: '🌸' },
+  { name: 'Fern', icon: '🌱' },
+  { name: 'Snake Plant', icon: '🐍' },
+  { name: 'Peace Lily', icon: '🌼' },
 ];
