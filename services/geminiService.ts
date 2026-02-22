@@ -1,8 +1,17 @@
 import { ZodiacSign, Personality, PetType } from "../types";
 
 const GITHUB_MODELS_ENDPOINT = 'https://models.inference.ai.azure.com/chat/completions';
-const MODEL = 'gpt-4o';
+
+// Fallback chain: try each model in order, skipping on 429 rate limits
+const MODEL_FALLBACK_CHAIN = ['gpt-4o', 'gpt-4o-mini', 'Phi-4'];
+
 const TOKEN_KEY = 'zodiaclol_github_token';
+
+const WISDOM_CAPPED_MESSAGES = [
+  "🌌 **Today's Cosmic Wisdom Is Capped**\n\nThe Oracle has spoken too many truths today and needs to rest. The stars are exhausted.\n\n*Come back tomorrow, when the cosmos reset and the sarcasm refills.* Or just... sit with the uncertainty. That's also very zodiac of you.",
+  "☿ **Mercury is Definitely in Retrograde Right Now**\n\nOr rather, the cosmic API limits are. Same thing.\n\n*The universe's daily wisdom quota has been met.* Come back tomorrow — or meditate on whatever you were going to ask. The answer is Scorpio. It's always Scorpio.",
+  "🔮 **The Crystal Ball Needs Charging**\n\nToo many seekers, too little cosmic bandwidth. Today's prophecies are sold out.\n\n*Return tomorrow for fresh chaos predictions.* In the meantime, just blame Mercury. You'll be right eventually.",
+];
 
 declare const __DEFAULT_TOKEN__: string;
 const DEFAULT_TOKEN: string = typeof __DEFAULT_TOKEN__ !== 'undefined' ? __DEFAULT_TOKEN__ : '';
@@ -12,77 +21,110 @@ export const saveToken = (token: string) => localStorage.setItem(TOKEN_KEY, toke
 export const clearToken = () => localStorage.removeItem(TOKEN_KEY);
 
 /**
- * A centralized, streaming-enabled function using GitHub Models API.
- * Keeps the same AsyncGenerator<string> interface as the original Gemini service.
+ * Attempts a single model request. Returns the Response on success,
+ * or throws an object { rateLimited: true } if 429, or yields error text for other failures.
+ */
+async function attemptModel(
+  model: string,
+  token: string,
+  systemPrompt: string,
+  userPrompt: string
+): Promise<Response> {
+  const response = await fetch(GITHUB_MODELS_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      model,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      stream: true,
+      temperature: 1.0,
+      max_tokens: 400,
+    }),
+  });
+  return response;
+}
+
+/**
+ * Streams text chunks from a successful SSE Response.
+ */
+async function* streamResponse(response: Response): AsyncGenerator<string> {
+  const reader = response.body!.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop() || '';
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed.startsWith('data: ')) continue;
+      const data = trimmed.slice(6);
+      if (data === '[DONE]') return;
+      try {
+        const parsed = JSON.parse(data);
+        const text = parsed.choices?.[0]?.delta?.content;
+        if (text) yield text;
+      } catch { /* ignore malformed SSE chunks */ }
+    }
+  }
+}
+
+/**
+ * Cascading stream: tries each model in MODEL_FALLBACK_CHAIN.
+ * On 429, silently tries the next. If all exhausted, shows a capped message.
  */
 async function* generateStream(
   systemPrompt: string,
   userPrompt: string
 ): AsyncGenerator<string> {
   const token = getStoredToken();
-
   if (!token) {
     yield "### No API Token\n\nPlease enter your GitHub token to activate the Cosmic Oracle.";
     return;
   }
 
-  try {
-    const response = await fetch(GITHUB_MODELS_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt },
-        ],
-        stream: true,
-        temperature: 1.0,
-        max_tokens: 400,
-      }),
-    });
+  for (const model of MODEL_FALLBACK_CHAIN) {
+    try {
+      const response = await attemptModel(model, token, systemPrompt, userPrompt);
 
-    if (!response.ok) {
-      const errText = await response.text();
-      if (response.status === 401) {
-        yield "### Invalid Token\n\nYour GitHub token is invalid or expired. Click the key icon to update it.";
-      } else if (response.status === 429) {
-        yield "### Rate Limited\n\nThe cosmic energy is running low. You've hit the rate limit — try again in a minute.";
-      } else {
-        yield `### Cosmic Connection Error\n\nAPI error ${response.status}. The stars are misaligned.`;
+      if (response.status === 429) {
+        // Rate limited on this model — try the next one
+        console.warn(`Rate limited on ${model}, trying next fallback...`);
+        continue;
       }
+
+      if (response.status === 401) {
+        yield "### Invalid Token\n\nYour GitHub token is invalid or expired. Click the 🔑 icon to update it.";
+        return;
+      }
+
+      if (!response.ok) {
+        yield `### Cosmic Connection Error\n\nAPI error ${response.status}. The stars are misaligned.`;
+        return;
+      }
+
+      // Success — stream the response
+      yield* streamResponse(response);
+      return;
+
+    } catch (error: any) {
+      console.error(`Error with model ${model}:`, error);
+      yield `### Cosmic Connection Error\n\nA disturbance in the cosmos: ${error.message ?? 'Unknown error'}. Please try again.`;
       return;
     }
-
-    const reader = response.body!.getReader();
-    const decoder = new TextDecoder();
-    let buffer = '';
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n');
-      buffer = lines.pop() || '';
-      for (const line of lines) {
-        const trimmed = line.trim();
-        if (!trimmed.startsWith('data: ')) continue;
-        const data = trimmed.slice(6);
-        if (data === '[DONE]') return;
-        try {
-          const parsed = JSON.parse(data);
-          const text = parsed.choices?.[0]?.delta?.content;
-          if (text) yield text;
-        } catch { /* ignore parse errors on empty chunks */ }
-      }
-    }
-  } catch (error: any) {
-    console.error('GitHub Models error:', error);
-    yield `### Cosmic Connection Error\n\nA disturbance in the cosmos: ${error.message ?? 'Unknown error'}. Please try again.`;
   }
+
+  // All models rate-limited — show the capped message
+  const msg = WISDOM_CAPPED_MESSAGES[Math.floor(Math.random() * WISDOM_CAPPED_MESSAGES.length)];
+  yield msg;
 }
 
 const getPersonaPrompt = (personality: Personality): string => {
